@@ -1,6 +1,6 @@
 [package]
 name = "kodegen_config"
-version = "0.1.0"
+version = "0.1.4"
 edition = "2024"
 description = "KODEGEN.ᴀɪ: Memory-efficient, Blazing-Fast, MCP tools for code generation agents."
 license = "Apache-2.0 OR MIT"
@@ -18,6 +18,18 @@ keywords = [
 ]
 
 [dependencies]
+
+# Error handling
+anyhow = "1.0"
+
+# Git repository detection
+git2 = "0.20"
+
+# Gitignore pattern matching (ripgrep's gitignore parser)
+ignore = "0.4"
+
+# Temporary file handling for atomic writes
+tempfile = "3"
 
 # Async runtime
 tokio = { version = "1", features = ["full"] }
@@ -46,6 +58,21 @@ lru = "0.16"
 
 # Logging
 log = "0.4"
+
+[target.'cfg(unix)'.dependencies]
+# Advisory file locking (Unix/Linux/macOS)
+nix = { version = "0.30", features = ["fs"] }
+
+[target.'cfg(windows)'.dependencies]
+# File locking via Windows API
+windows = { version = "0.62", features = [
+    "Win32_Foundation",
+    "Win32_Storage_FileSystem",
+    "Win32_System_IO",
+] }
+
+[dev-dependencies]
+env_logger = "0.11"
 
 [lib]
 name = "kodegen_config"
