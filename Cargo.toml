@@ -1,6 +1,6 @@
 [package]
 name = "kodegen_config"
-version = "0.5.1"
+version = "0.5.2"
 edition = "2024"
 description = "KODEGEN.ᴀɪ: Memory-efficient, Blazing-Fast, MCP tools for code generation agents."
 license = "Apache-2.0 OR MIT"
@@ -21,9 +21,6 @@ keywords = [
 
 # Error handling
 anyhow = "1.0"
-
-# Git repository detection
-git2 = "0.20"
 
 # Gitignore pattern matching (ripgrep's gitignore parser)
 ignore = "0.4"

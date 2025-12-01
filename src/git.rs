@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Type alias for the git root cache
 /// Cache stores Option<PathBuf> where None means "not in a git repository"
@@ -21,7 +21,7 @@ static GIT_ROOT_CACHE: std::sync::LazyLock<GitRootCache> =
 /// a process changes directories.
 /// 
 /// **Performance:**
-/// - First call for a directory: 1-50ms (filesystem walk via git2)
+/// - First call for a directory: <1ms (filesystem walk)
 /// - Subsequent calls: <1μs (in-memory HashMap lookup with read lock)
 /// 
 /// **Thread Safety:** 
@@ -74,19 +74,18 @@ pub fn find_git_root() -> Result<PathBuf> {
 }
 
 /// Internal function that performs the actual git repository discovery
-/// 
-/// This is separated from `find_git_root()` to keep caching logic isolated
-/// from git discovery logic.
-fn discover_git_root(current_dir: &PathBuf) -> Result<PathBuf> {
-    let repo = git2::Repository::discover(current_dir)
-        .context(format!(
-            "Not in a git repository (searched from: {})",
-            current_dir.display()
-        ))?;
-
-    repo.workdir()
-        .map(|p| p.to_path_buf())
-        .context("Git repository has no working directory (bare repository?)")
+///
+/// Walks up the directory tree looking for a .git directory.
+fn discover_git_root(current_dir: &Path) -> Result<PathBuf> {
+    let mut dir = current_dir.to_path_buf();
+    loop {
+        if dir.join(".git").exists() {
+            return Ok(dir);
+        }
+        if !dir.pop() {
+            anyhow::bail!("Not in a git repository (searched from: {})", current_dir.display());
+        }
+    }
 }
 
 /// Clear the git root cache
