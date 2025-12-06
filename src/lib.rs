@@ -94,6 +94,9 @@ mod git;
 mod init;
 mod platform;
 mod toolset;
+mod path_display;
+
+pub use path_display::shorten_path_for_display;
 
 // ============================================================================
 // Infrastructure HTTP Headers
