@@ -96,7 +96,12 @@ mod platform;
 mod toolset;
 mod path_display;
 
+pub mod constants;
+
 pub use path_display::shorten_path_for_display;
+
+// Re-export all constants for convenience
+pub use constants::*;
 
 // ============================================================================
 // Infrastructure HTTP Headers
