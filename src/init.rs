@@ -21,6 +21,7 @@ fn create_user_structure() -> Result<()> {
     let state_dir = crate::KodegenConfig::state_dir()?;
     let data_dir = crate::KodegenConfig::data_dir()?;
     let log_dir = crate::KodegenConfig::log_dir()?;
+    let cache_dir = crate::KodegenConfig::cache_dir()?;
 
     // Create config subdirectories
     fs::create_dir_all(config_dir.join("toolset"))?;
@@ -35,6 +36,9 @@ fn create_user_structure() -> Result<()> {
     // Create data subdirectories
     fs::create_dir_all(data_dir.join("stats"))?;
     fs::create_dir_all(data_dir.join("memory"))?;
+
+    // Create cache directory (for temporary build artifacts, downloads)
+    fs::create_dir_all(&cache_dir)?;
 
     // Create .gitignore if it doesn't exist
     let gitignore_path = config_dir.join(".gitignore");

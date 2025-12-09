@@ -14,10 +14,20 @@
 //!
 //! All path resolution functions return `Result<PathBuf>` for consistency:
 //!
-//! - [`user_config_dir()`](KodegenConfig::user_config_dir) - User-global config directory
-//! - [`local_config_dir()`](KodegenConfig::local_config_dir) - Git workspace-local config directory
-//! - [`state_dir()`](KodegenConfig::state_dir) - Runtime state directory
-//! - [`data_dir()`](KodegenConfig::data_dir) - Application data directory
+//! **Root directories:**
+//! - [`user_config_dir()`](KodegenConfig::user_config_dir) - User-global root directory (~/.config/kodegen)
+//! - [`local_config_dir()`](KodegenConfig::local_config_dir) - Git workspace-local config directory (.kodegen/)
+//!
+//! **Subdirectories (all under root):**
+//! - [`config_dir()`](KodegenConfig::config_dir) - Configuration files (root/config/)
+//! - [`toolset_dir()`](KodegenConfig::toolset_dir) - Tool definitions (root/toolset/)
+//! - [`state_dir()`](KodegenConfig::state_dir) - Runtime state: PIDs, sockets (root/state/)
+//! - [`log_dir()`](KodegenConfig::log_dir) - Log files (root/logs/)
+//! - [`data_dir()`](KodegenConfig::data_dir) - Persistent data: DB, certs (root/data/)
+//! - [`cache_dir()`](KodegenConfig::cache_dir) - Temporary cache: builds, downloads (root/cache/)
+//! - [`bin_dir()`](KodegenConfig::bin_dir) - Binaries (root/bin/)
+//!
+//! **File resolution:**
 //! - [`resolve_toolset()`](KodegenConfig::resolve_toolset) - Resolve toolset file with precedence
 //! - [`resolve_config_file()`](KodegenConfig::resolve_config_file) - Resolve config file with precedence
 //!
@@ -92,7 +102,7 @@ use std::path::{Path, PathBuf};
 mod validation;
 mod git;
 mod init;
-mod platform;
+pub(crate) mod platform;  // Keep for user_config_dir implementation
 mod toolset;
 mod path_display;
 
@@ -225,42 +235,67 @@ impl KodegenConfig {
         git::find_git_root().map(|root| root.join(".kodegen"))
     }
 
-    /// Get state directory (for PIDs, sockets, runtime state)
+    /// Get config subdirectory (for daemon configuration files)
     ///
-    /// **Note**: Log files should use `log_dir()` instead.
+    /// **Returns**: `{root}/config/`
     ///
-    /// **Platform paths**:
-    /// - Unix/Linux: `$XDG_STATE_HOME/kodegen` (default: `~/.local/state/kodegen`)
-    /// - macOS: `~/Library/Application Support/kodegen/state`
-    /// - Windows: `%LOCALAPPDATA%\kodegen\state`
+    /// Example: `~/.config/kodegen/config/`
+    pub fn config_dir() -> Result<PathBuf> {
+        Ok(Self::user_config_dir()?.join("config"))
+    }
+
+    /// Get toolset subdirectory (for tool definitions)
     ///
-    /// State ALWAYS uses user-global directories (never local `.kodegen/`).
+    /// **Returns**: `{root}/toolset/`
+    ///
+    /// Example: `~/.config/kodegen/toolset/`
+    pub fn toolset_dir() -> Result<PathBuf> {
+        Ok(Self::user_config_dir()?.join("toolset"))
+    }
+
+    /// Get state subdirectory (for PIDs, sockets, runtime state)
+    ///
+    /// **Returns**: `{root}/state/`
+    ///
+    /// Example: `~/.config/kodegen/state/`
     pub fn state_dir() -> Result<PathBuf> {
-        platform::state_dir()
+        Ok(Self::user_config_dir()?.join("state"))
     }
 
-    /// Get log directory (for .log files only)
+    /// Get log subdirectory (for .log files)
     ///
-    /// **Platform paths**:
-    /// - Unix/Linux: `$XDG_STATE_HOME/kodegen/logs` (default: `~/.local/state/kodegen/logs`)
-    /// - macOS: `~/Library/Logs/kodegen`
-    /// - Windows: `%LOCALAPPDATA%\kodegen\logs`
+    /// **Returns**: `{root}/logs/`
     ///
-    /// Logs ALWAYS use user-global directories (never local `.kodegen/`).
+    /// Example: `~/.config/kodegen/logs/`
     pub fn log_dir() -> Result<PathBuf> {
-        platform::log_dir()
+        Ok(Self::user_config_dir()?.join("logs"))
     }
 
-    /// Get data directory (for databases, stats, caches)
+    /// Get data subdirectory (for databases, stats, caches, certificates)
     ///
-    /// **Platform paths**:
-    /// - Unix/Linux: `$XDG_DATA_HOME/kodegen` (default: `~/.local/share/kodegen`)
-    /// - macOS: `~/Library/Application Support/kodegen/data`
-    /// - Windows: `%LOCALAPPDATA%\kodegen\data`
+    /// **Returns**: `{root}/data/`
     ///
-    /// Data ALWAYS uses user-global directories (never local `.kodegen/`).
+    /// Example: `~/.config/kodegen/data/`
     pub fn data_dir() -> Result<PathBuf> {
-        platform::data_dir()
+        Ok(Self::user_config_dir()?.join("data"))
+    }
+
+    /// Get bin subdirectory (for binary storage before symlinking)
+    ///
+    /// **Returns**: `{root}/bin/`
+    ///
+    /// Example: `~/.config/kodegen/bin/`
+    pub fn bin_dir() -> Result<PathBuf> {
+        Ok(Self::user_config_dir()?.join("bin"))
+    }
+
+    /// Get cache subdirectory (for temporary build artifacts, downloads, Chrome cache)
+    ///
+    /// **Returns**: `{root}/cache/`
+    ///
+    /// Example: `~/.config/kodegen/cache/`
+    pub fn cache_dir() -> Result<PathBuf> {
+        Ok(Self::user_config_dir()?.join("cache"))
     }
 
     /// Resolve toolset file path with local > user precedence
