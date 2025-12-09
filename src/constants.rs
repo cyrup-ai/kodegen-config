@@ -9,56 +9,124 @@
 //! All references to these values MUST use these constants - no hardcoded strings/numbers.
 
 // ============================================================================
+// CATEGORY TYPE
+// ============================================================================
+
+/// Structured category definition with name and icon
+///
+/// This ensures every category has both a name and an icon at compile time.
+/// Used by ToolArgs trait to provide default icon() implementation.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct Category {
+    pub name: &'static str,
+    pub icon: char,
+}
+
+impl std::fmt::Display for Category {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.name)
+    }
+}
+
+// ============================================================================
 // CATEGORY CONSTANTS
 // ============================================================================
 
 /// Browser automation and web interaction
-pub const CATEGORY_BROWSER: &str = "browser";
+pub const CATEGORY_BROWSER: &Category = &Category {
+    name: "browser",
+    icon: 'Ƅ',  // LATIN CAPITAL LETTER TONE SIX
+};
 
 /// Candle-based local LLM agent (serves memory tools)
-pub const CATEGORY_CANDLE_AGENT: &str = "candle_agent";
+pub const CATEGORY_CANDLE_AGENT: &Category = &Category {
+    name: "candle_agent",
+    icon: 'Ⲵ',  // COPTIC CAPITAL LETTER OLD COPTIC AIN
+};
 
 /// Web crawling and indexing with Tantivy
-pub const CATEGORY_CITESCRAPE: &str = "citescrape";
+pub const CATEGORY_CITESCRAPE: &Category = &Category {
+    name: "citescrape",
+    icon: '⚚',  // STAFF OF HERMES
+};
 
 /// Claude sub-agent delegation
-pub const CATEGORY_CLAUDE_AGENT: &str = "claude_agent";
+pub const CATEGORY_CLAUDE_AGENT: &Category = &Category {
+    name: "claude_agent",
+    icon: 'Ⲵ',  // COPTIC CAPITAL LETTER OLD COPTIC AIN
+};
 
 /// Configuration value management
-pub const CATEGORY_CONFIG: &str = "config";
+pub const CATEGORY_CONFIG: &Category = &Category {
+    name: "config",
+    icon: '⚙',  // GEAR
+};
 
 /// Database operations and schema inspection
-pub const CATEGORY_DATABASE: &str = "database";
+pub const CATEGORY_DATABASE: &Category = &Category {
+    name: "database",
+    icon: '⛁',  // WHITE DRAUGHTS KING
+};
 
 /// File system operations
-pub const CATEGORY_FILESYSTEM: &str = "filesystem";
+pub const CATEGORY_FILESYSTEM: &Category = &Category {
+    name: "filesystem",
+    icon: '⚒',  // HAMMER AND PICK
+};
 
 /// Git version control operations
-pub const CATEGORY_GIT: &str = "git";
+pub const CATEGORY_GIT: &Category = &Category {
+    name: "git",
+    icon: '⛙',  // WHITE LEFT LANE MERGE
+};
 
 /// GitHub API operations
-pub const CATEGORY_GITHUB: &str = "github";
+pub const CATEGORY_GITHUB: &Category = &Category {
+    name: "github",
+    icon: '⇅',  // UTF 113
+};
 
 /// Tool usage statistics and introspection
-pub const CATEGORY_INTROSPECTION: &str = "introspection";
+pub const CATEGORY_INTROSPECTION: &Category = &Category {
+    name: "introspection",
+    icon: '⚝',  // STAR WITH INSIDE LINES
+};
 
 /// Memory and knowledge management (served by candle-agent)
-pub const CATEGORY_MEMORY: &str = "memory";
+pub const CATEGORY_MEMORY: &Category = &Category {
+    name: "memory",
+    icon: '⚿',  // SQUARED KEY
+};
 
 /// Process management
-pub const CATEGORY_PROCESS: &str = "process";
+pub const CATEGORY_PROCESS: &Category = &Category {
+    name: "process",
+    icon: '♆',  // NEPTUNE
+};
 
 /// Prompt template management
-pub const CATEGORY_PROMPT: &str = "prompt";
+pub const CATEGORY_PROMPT: &Category = &Category {
+    name: "prompt",
+    icon: '⚑',  // BLACK FLAG
+};
 
 /// Reasoner tool backend
-pub const CATEGORY_REASONER: &str = "reasoner";
+pub const CATEGORY_REASONER: &Category = &Category {
+    name: "reasoner",
+    icon: '☫',  // FARSI SYMBOL
+};
 
 /// Sequential thinking tool backend
-pub const CATEGORY_SEQUENTIAL_THINKING: &str = "sequential-thinking";
+pub const CATEGORY_SEQUENTIAL_THINKING: &Category = &Category {
+    name: "sequential_thinking",
+    icon: '⚛',  // ATOM
+};
 
 /// Terminal command execution
-pub const CATEGORY_TERMINAL: &str = "terminal";
+pub const CATEGORY_TERMINAL: &Category = &Category {
+    name: "terminal",
+    icon: '⛩',  // SHINTO SHRINE
+};
 
 // ============================================================================
 // TOOL NAME CONSTANTS
@@ -297,7 +365,7 @@ pub const PORT_MAX: u16 = 30452;
 /// - kodegen routing table (stdio/metadata/routing.rs)
 /// - kodegend daemon configuration (kodegend/src/config.rs)
 /// - Monitor command (kodegen/src/commands/monitor.rs)
-pub const CATEGORY_PORTS: &[(&str, u16)] = &[
+pub const CATEGORY_PORTS: &[(&Category, u16)] = &[
     (CATEGORY_BROWSER, PORT_BROWSER),
     (CATEGORY_CANDLE_AGENT, PORT_CANDLE_AGENT),
     (CATEGORY_CITESCRAPE, PORT_CITESCRAPE),
@@ -339,7 +407,7 @@ mod tests {
                 *port >= PORT_MIN && *port <= PORT_MAX,
                 "Port {} for category {} outside valid range {}-{}",
                 port,
-                cat,
+                cat.name,
                 PORT_MIN,
                 PORT_MAX
             );
