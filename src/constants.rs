@@ -250,7 +250,6 @@ pub const BROWSER_RESEARCH: &str = "browser_research";
 pub const BROWSER_SCREENSHOT: &str = "browser_screenshot";
 pub const BROWSER_SCROLL: &str = "browser_scroll";
 pub const BROWSER_TYPE_TEXT: &str = "browser_type_text";
-pub const BROWSER_WEB_SEARCH: &str = "browser_web_search";
 
 // Database tools
 pub const DB_EXECUTE_SQL: &str = "db_execute_sql";

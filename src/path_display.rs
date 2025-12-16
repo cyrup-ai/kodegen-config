@@ -40,18 +40,18 @@ use std::path::Path;
 /// ```
 pub fn shorten_path_for_display(path: &Path, git_root: Option<&Path>) -> String {
     // Strategy 1: Git root relative (highest priority)
-    if let Some(root) = git_root {
-        if let Ok(relative) = path.strip_prefix(root) {
-            return relative.display().to_string();
-        }
+    if let Some(root) = git_root
+        && let Ok(relative) = path.strip_prefix(root)
+    {
+        return relative.display().to_string();
     }
     
     // Strategy 2: Home directory relative
-    if let Some(home_dir) = dirs::home_dir() {
-        if let Ok(relative) = path.strip_prefix(&home_dir) {
-            // Format with tilde notation
-            return format!("~/{}", relative.display());
-        }
+    if let Some(home_dir) = dirs::home_dir()
+        && let Ok(relative) = path.strip_prefix(&home_dir)
+    {
+        // Format with tilde notation
+        return format!("~/{}", relative.display());
     }
     
     // Strategy 3: Absolute path (fallback)

@@ -19,9 +19,10 @@ fn test_data_dir_exists() {
 }
 
 #[test]
-fn test_local_config_dir_returns_option() {
-    // Should return Some if in git repo, None otherwise
+fn test_local_config_dir_returns_result() {
+    // Should return Ok if in git repo, Err otherwise
     let result = KodegenConfig::local_config_dir();
     // Can't assert specific value without knowing test environment
-    assert!(result.is_some() || result.is_none());
+    // Just verify it returns a Result (either Ok or Err)
+    assert!(result.is_ok() || result.is_err());
 }
